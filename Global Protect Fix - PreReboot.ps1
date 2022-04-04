@@ -92,6 +92,11 @@ function Remove-GlobalProtect {
 
 }
 
+# I currently do not run this function in this script as the inf file appear to be randomly assigned by Windows.
+# Plus it turns out that the adapter is removed as part of the VPN software uninstallation process, so running this
+# would likely violate D.R.Y (Don't Repeat Yourself) principle. However I decided to leave it up here anyway just in
+# case someone else may find this helpful. 
+
 <# Make sure that the virtual adapter in not present in the Network adapter settings
 function Verify-VirtualAdapterNotPresent {
 
@@ -145,13 +150,3 @@ function Perform-Reboot {
     Invoke-Command -ScriptBlock {shutdown /r} 
 
 }
-
-Disable-WMIService
-Delete-FilesInSubFolder
-Delete-RegKey
-Remove-GlobalProtect
-#Verify-VirtualAdapterNotPresent
-Schedule-PostRebootTask
-Perform-Reboot
-
-exit
