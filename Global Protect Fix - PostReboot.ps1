@@ -95,10 +95,3 @@ function Remove-ScheduledTask {
         {Write-Host "Scheduled post-reboot task has already been removed" -ForegroundColor Yellow}
 
 }
-
-Enable-WMIService
-Install-GlobalProtect
-Remove-ScheduledTask
-
-exit
-
