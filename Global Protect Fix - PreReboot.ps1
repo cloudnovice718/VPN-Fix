@@ -73,29 +73,41 @@ function Delete-RegKey {
 function Remove-GlobalProtect {
 
     $GPAppName = "GlobalProtect"
-    $GPAppInstalled = (
+    $uninstallKeyPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*"
+    $msiexecPath = 'C:\Windows\System32\msiexec.exe'
+    $argsList = '/x "C:\temp\Global Protect Fix\Global Protect\Files\GlobalProtect64.msi" /passive'
+    $GPInstalled = (
 
-        Get-ItemProperty -Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | 
-        Where-Object { $_.DisplayName -Match $GPAppName }
+        Get-ItemProperty -Path $uninstallKeyPath | Where-Object { $_.DisplayName -Match $GPAppName }
 
         )
+    $GProcess = @("PanGPA", "PanGPS")
+    $GProcessCheck = Get-Process $GProcess -ErrorAction SilentlyContinue
+
+    if ($null -ne $GProcessCheck) {
+
+        Write-Host "Stopping $GPAppName Processes..."
+        $GProcessCheck | Stop-Process -Force -ErrorAction SilentlyContinue
+        Write-Host "Processes successfully stopped. Proceeding with installation..."
+       
+        }
+
+    else { Write-Host "Unable to find any running processes. Proceeding with installation..." }    
 
     Write-Host "Uninstalling $GPAppName..."
 
-    if ($GPAppInstalled)
+    if ($GPInstalled) {
+    
+        Start-Process -FilePath $msiexecPath -ArgumentList $argsList -Wait
+        Write-Host "$GPAppName removed successfully!" -ForegroundColor Green
 
-        {Get-Package -Name $GPAppName -ProviderName "msi" | Uninstall-Package; Write-Host "$GPAppName removed successfully!" -ForegroundColor Green}
+        }       
 
     else
 
         {Write-Host "$GPAppName not installed. Continuing..." -ForegroundColor Yellow}
 
 }
-
-# I currently do not run this function in this script as the inf file appear to be randomly assigned by Windows.
-# Plus it turns out that the adapter is removed as part of the VPN software uninstallation process, so running this
-# would likely violate D.R.Y (Don't Repeat Yourself) principle. However I decided to leave it up here anyway just in
-# case someone else may find this helpful. 
 
 <# Make sure that the virtual adapter in not present in the Network adapter settings
 function Verify-VirtualAdapterNotPresent {
@@ -150,3 +162,13 @@ function Perform-Reboot {
     Invoke-Command -ScriptBlock {shutdown /r} 
 
 }
+
+Disable-WMIService
+Delete-FilesInSubFolder
+Delete-RegKey
+Remove-GlobalProtect
+#Verify-VirtualAdapterNotPresent
+Schedule-PostRebootTask
+Perform-Reboot
+
+exit

@@ -30,17 +30,16 @@ function Install-GlobalProtect {
     $GPInstall = "C:\temp\Global Protect Fix\Global Protect\Deploy-Application.exe"
     $GPVersion = "5.1.8"
     $GPAppName = "GlobalProtect"
+    $uninstallKeyPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*"
     $GPVersInstalled = (
 
-        Get-ItemProperty -Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | 
-        Where-Object { $_.DisplayVersion -Match $GPVersion }
+        Get-ItemProperty -Path $uninstallKeyPath | Where-Object { $_.DisplayVersion -Match $GPVersion }
 
         )
 
     $GPAppInstalled = (
 
-        Get-ItemProperty -Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | 
-        Where-Object { $_.DisplayName -Match $GPAppName }
+        Get-ItemProperty -Path $uninstallKeyPath | Where-Object { $_.DisplayName -Match $GPAppName }
 
         )
 
@@ -95,3 +94,10 @@ function Remove-ScheduledTask {
         {Write-Host "Scheduled post-reboot task has already been removed" -ForegroundColor Yellow}
 
 }
+
+Enable-WMIService
+Install-GlobalProtect
+Remove-ScheduledTask
+
+exit
+
