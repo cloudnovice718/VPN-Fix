@@ -162,13 +162,3 @@ function Perform-Reboot {
     Invoke-Command -ScriptBlock {shutdown /r} 
 
 }
-
-Disable-WMIService
-Delete-FilesInSubFolder
-Delete-RegKey
-Remove-GlobalProtect
-#Verify-VirtualAdapterNotPresent
-Schedule-PostRebootTask
-Perform-Reboot
-
-exit
