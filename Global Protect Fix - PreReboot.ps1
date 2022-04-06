@@ -109,28 +109,6 @@ function Remove-GlobalProtect {
 
 }
 
-<# Make sure that the virtual adapter in not present in the Network adapter settings
-function Verify-VirtualAdapterNotPresent {
-
-    $VirtualAdapterName = "PANGP Virtual Ethernet Adapter"
-    $VirtualAdapterExists = Get-PnpDevice | Where-Object {$_.FriendlyName -eq $VirtualAdapterName}
-
-    Write-Host "Checking if $VirtualAdapterName is present..."
-
-    if ($VirtualAdapterExists) {
-
-        Invoke-Command -ScriptBlock {pnputil /delete-driver oem50.inf /force}
-        Write-Host "$VirtualAdapterName removed successfully!" -ForegroundColor Green
-        
-        }
-        
-    else 
-        
-        {Write-Host "$VirtualAdapterName is not currently present on this system. Continuing..." -ForegroundColor Yellow}
-
-}
-#>
-
 # Ensure post-reboot script runs automatically on reboot
 function Schedule-PostRebootTask {
 
